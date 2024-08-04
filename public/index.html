@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    *{
+  margin: 0;
+  padding: 0;
+}
+
+.container{
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  
+}
+.makeConnection{
+  
+  width: 90vw;
+  margin: auto;
+  display: flex;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.makeConnection h3{
+  margin-top: 3vh;
+  font-size: 6vh;
+  padding: 3vh 0;
+}
+.makeConnection input{
+  font-size: 2.8vh;
+  padding: 1.5vh;
+  margin: 3vh 0;
+  border: none;
+  outline: 0;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1vh;
+}
+.makeConnection button{
+  font-size: 3vh;
+  padding: 1vh 2vh;
+  margin: 3vh;
+  margin-bottom: 6vh;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border: 0;
+  outline: 0;
+  border-radius: 1vh;
+  font-weight: 900;
+  background-color: #2400FF;
+  color: white;
+}
+.chatBox{
+  width: 100vw;
+  height 100vh;
+display: none;
+flex-direction:column;
+overflow:hidden;
+
+}
+.chats{
+  height: 94vh;
+  width: 100vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.chatInput{
+  height:6vh;
+  display: flex;
+  width: 98vw;
+  
+  margin: 0 auto;
+  margin-top: -1vh;
+}
+.chatInput input{
+  flex: 1;
+  font-size: 2vh;
+  padding: 0 3vh;
+  border: 0;
+  outline: 0;
+  border-radius: 5vh;
+  background: #C5C5C5C7;
+  font-weight: 900;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.chatInput button{
+  font-size: 3vh;
+  border: 0;
+  outline: 0;
+  border-radius: 5vh;
+  padding: 1vh 2vh;
+  color: white;
+  background-color: #029C47;
+  border-top-left-radius: 0;
+border-bottom-left-radius: 0;
+}
+.message{
+  
+  font-size: 2.5vh;
+  padding: 1vh 2vh;
+  margin: 2vh 0;
+  
+  
+  
+}
+.message span{
+  background: #0DE86FEB;
+  padding: 1.5vh 3vh;
+  border-radius: 5vh;
+  font-weight: 600;
+  
+
+width: 0;
+max-width: 90vw;
+white-space: nowrap;
+  text-overflow: ellipsis;
+  
+}
+
+.left{
+  text-align: left;
+  
+}
+.right{
+  text-align: right;
+}
+.left span{
+  background: #E8570DEB;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+   <form class="makeConnection" id="firstForm">
+     <h3>G-Chat</h3>
+     <input type="text" id="name" placeholder="Enter your name">
+     <button type="submit">Connect</button>
+   </form>
+   <form class="chatBox">
+     <div class="chats">
+       
+     
+       
+
+     </div>
+     <div class="chatInput">
+       <input type="text" id="message" placeholder="Send from here...">
+       <button type="submit">Send</button>
+     </form>
+   </div>
+  </div>
+  
+<script>
+  const socket = io()
+  let firstForm = document.getElementById('firstForm')
+  let nameInput = document.getElementById('name')
+  let chats=document.querySelector('.chats')
+  let chatBox = document.querySelector('.chatBox')
+  let queryContainer = document.querySelector('.makeConnection')
+  let name=''
+  
+  firstForm.addEventListener('submit',(e)=> {
+    if(nameInput.value===''){
+      alert('Enter you name First')
+      }
+      else{
+    e.preventDefault()
+    socket.emit('new-user',nameInput.value)
+    
+    queryContainer.style.display ='none'
+    chatBox.style.display='flex'
+    name=nameInput.value}
+    
+  })
+  socket.on('new-user-found',(name)=> {
+    append(name,`New user found`,'right')
+  })
+  function append(name,message, position){
+    chats.innerHTML+=`<div class="message ${position}">
+         <span>${name} : ${message}</span>
+       </div>`
+  }
+  let message = document.getElementById('message')
+  document.querySelector('.chatBox').addEventListener('submit',e=> {
+    e.preventDefault()
+    
+    socket.emit('new-chat',{name:name,message:message.value})
+    
+    append('You', message.value, 'right')
+    message.value=''
+  })
+  socket.on('create-chat',data=> {
+    append(data.name,data.message,'left')
+  })
+  
+</script>
+</body>
+
+</html>
