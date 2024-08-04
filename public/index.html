@@ -176,7 +176,7 @@ white-space: nowrap;
       else{
     e.preventDefault()
     socket.emit('new-user',nameInput.value)
-    
+    openFullscreen()
     queryContainer.style.display ='none'
     chatBox.style.display='flex'
     name=nameInput.value}
@@ -202,6 +202,18 @@ white-space: nowrap;
   socket.on('create-chat',data=> {
     append(data.name,data.message,'left')
   })
+  
+  function openFullscreen() {
+    let elem =document.querySelector('.container')
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
   
 </script>
 </body>
